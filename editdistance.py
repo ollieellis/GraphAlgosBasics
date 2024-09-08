@@ -1,4 +1,5 @@
 #not a graph algo; but something i forgot
+from functools import cache
 
 class EditDistance:
     def bottom_up(self, word1: str, word2: str) -> int:
@@ -17,13 +18,30 @@ class EditDistance:
                     dp_table[i][j] = edit_distance_ij
         
         return dp_table[-1][-1]
-    
+
+    def top_down(self, word1: str, word2: str) -> int:
+        
+        @cache
+        def rec_get_edit_distance(w1, w2, i1, i2):
+            if i1 == 0:
+                return i2
+            if i2 == 0:
+                return i1
+
+            if w1[i1 - 1] == w2[i2 - 1]:
+                return rec_get_edit_distance(w1, w2, i1-1, i2-1)
+
+            replace = 1 + rec_get_edit_distance(word1, word2, i1-1, i2-1)
+            delete = 1 + rec_get_edit_distance(word1, word2, i1-1, i2)
+            add = 1 + rec_get_edit_distance(word1, word2, i1, i2-1)
+            return min(replace, delete, add) #+1?
+
+        return rec_get_edit_distance(word1, word2, len(word1), len(word2))
+
     def print_tbl(self, dp_table, word1, word2):
         header = ["_", " "] + [i for i in word2]
         print(header)
-        w1 = " "+word1
         for i, l in enumerate(dp_table):
-            print([w1[i]] + [str(i) for i in l])
-
+            print(["_"] + [word1[i]] + [str(i) for i in l])
 
 
